@@ -9,6 +9,7 @@ def clean_email(value):
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'confirm_password')
@@ -16,6 +17,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
             'email': {'validators': (clean_email,)}
         }
+
+    def create(self, validated_data):
+        del validated_data['confirm_password']
+        return User.objects.create_user(**validated_data)
 
     def validate_username(self, value):
         if value == 'admin':
