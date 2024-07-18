@@ -1,10 +1,12 @@
-from rest_framework import status, viewsets, permissions
+from rest_framework import status, viewsets, permissions, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from rest_framework.pagination import PageNumberPagination
 from .serializers import UserRegisterSerializer, UserSerializer
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class UserRegisterView(APIView):
@@ -46,3 +48,26 @@ class UserViewSet(viewsets.ViewSet):
         user.is_active = False
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserApiView(APIView):
+    """
+    get all user info
+    """
+    def get(self, request):
+        queryset = User.objects.all()
+        page_number = self.request.query_params.get('page', 1)
+        page_size = self.request.query_params.get('limit', 2)
+        paginator = Paginator(queryset, page_size)
+        ser_data = UserSerializer(paginator.page(page_number), many=True)
+        return Response(ser_data.data)
+
+
+class Large(PageNumberPagination):
+    page_size = 2
+
+
+class UserListApiView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = Large

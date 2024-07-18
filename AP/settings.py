@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'home.apps.HomeConfig',
     'accounts.apps.AccountsConfig',
-    'rest_framework.authtoken',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -128,8 +128,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST_FRAMEWORK
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'questions': '3/minute',
+    },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'rest_framework.renderers.JSONRenderer',
+    # ],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 2,
+    'DEFAULT_METADATA_CLASS': 'permissions.CustomMetadata'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shop Rest',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0'
 }
